@@ -1,0 +1,122 @@
+import { useEffect, useRef } from 'react';
+
+// Hook personalizado para animações de interseção
+export const useIntersectionObserver = (options = {}) => {
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-slide-up');
+          entry.target.style.opacity = '1';
+        }
+      });
+    }, { threshold: 0.1, ...options });
+    
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+    
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [options]);
+  
+  return ref;
+};
+
+// Hook para lazy loading de imagens
+export const useLazyLoading = () => {
+  useEffect(() => {
+    const lazyImages = document.querySelectorAll('.lazy-image');
+    
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            const dataSrc = img.getAttribute('data-src');
+            
+            if (dataSrc) {
+              img.src = dataSrc;
+              img.classList.remove('lazy-image');
+              img.classList.add('loaded');
+              imageObserver.unobserve(img);
+            }
+          }
+        });
+      });
+      
+      lazyImages.forEach(img => {
+        imageObserver.observe(img);
+      });
+    } else {
+      // Fallback para navegadores que não suportam IntersectionObserver
+      lazyImages.forEach(img => {
+        const dataSrc = img.getAttribute('data-src');
+        if (dataSrc) {
+          (img as HTMLImageElement).src = dataSrc;
+          img.classList.remove('lazy-image');
+          img.classList.add('loaded');
+        }
+      });
+    }
+  }, []);
+};
+
+// Hook para detectar tema do sistema
+export const useSystemTheme = () => {
+  const [theme, setTheme] = useState('light');
+  
+  useEffect(() => {
+    // Verificar preferência do sistema
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setTheme(e.matches ? 'dark' : 'light');
+    };
+    
+    // Definir tema inicial
+    setTheme(mediaQuery.matches ? 'dark' : 'light');
+    
+    // Adicionar listener para mudanças
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
+  
+  return theme;
+};
+
+// Importação necessária para o hook useSystemTheme
+import { useState } from 'react';
+
+// Hook para detectar tamanho da tela
+export const useWindowSize = () => {
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  return windowSize;
+};

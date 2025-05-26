@@ -1,0 +1,92 @@
+import { useEffect, useRef } from 'react';
+import { ArrowDown, Download, Eye } from 'lucide-react';
+
+const Hero = () => {
+  const typingRef = useRef<HTMLSpanElement>(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && typingRef.current) {
+          typingRef.current.classList.add('animate-typing');
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (typingRef.current) {
+      observer.observe(typingRef.current);
+    }
+    
+    return () => {
+      if (typingRef.current) {
+        observer.unobserve(typingRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <section id="hero" className="min-h-screen flex items-center pt-20 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent dark:from-accent/10 dark:to-transparent -z-10"></div>
+      
+      <div className="container mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
+        <div className="order-2 md:order-1">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+            Olá, eu sou <br />
+            <span className="text-accent">Vinícius R.</span>
+          </h1>
+          
+          <div className="h-12 mb-6">
+            <span 
+              ref={typingRef}
+              className="text-xl md:text-2xl font-light inline-block overflow-hidden whitespace-nowrap w-0"
+            >
+              Desenvolvedor de Landing Pages Profissionais
+            </span>
+          </div>
+          
+          <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+            Transformando ideias em experiências digitais impactantes. 
+            Especialista em criar landing pages que convertem visitantes em clientes.
+          </p>
+          
+          <div className="flex flex-wrap gap-4">
+            <a 
+              href="#projetos" 
+              className="btn btn-primary px-6 py-3 rounded-md"
+            >
+              <Eye className="mr-2 h-5 w-5" />
+              Ver Projetos
+            </a>
+            <a 
+              href="/cv.pdf" 
+              className="btn btn-outline px-6 py-3 rounded-md"
+              download
+            >
+              <Download className="mr-2 h-5 w-5" />
+              Baixar CV
+            </a>
+          </div>
+        </div>
+        
+        <div className="order-1 md:order-2 flex justify-center">
+          <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-accent shadow-xl">
+            {/* Placeholder para a foto - será substituída por uma imagem real */}
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-primary/50 flex items-center justify-center text-background text-xl font-bold">
+              Foto Profissional
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <a href="#sobre" className="flex flex-col items-center text-sm text-muted-foreground hover:text-accent transition-colors">
+          <span className="mb-2">Rolar para baixo</span>
+          <ArrowDown className="h-5 w-5" />
+        </a>
+      </div>
+    </section>
+  );
+};
+
+export default Hero;

@@ -1,0 +1,52 @@
+import { useEffect } from 'react';
+
+// Componente para otimização de imagens com lazy loading
+const LazyImage = ({ src, alt, className, width, height }: {
+  src: string;
+  alt: string;
+  className?: string;
+  width?: number | string;
+  height?: number | string;
+}) => {
+  useEffect(() => {
+    const lazyImageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target as HTMLImageElement;
+          const dataSrc = img.getAttribute('data-src');
+          
+          if (dataSrc) {
+            img.src = dataSrc;
+            img.classList.remove('opacity-0');
+            img.classList.add('opacity-100');
+            lazyImageObserver.unobserve(img);
+          }
+        }
+      });
+    });
+    
+    const lazyImages = document.querySelectorAll('.lazy-image');
+    lazyImages.forEach(img => {
+      lazyImageObserver.observe(img);
+    });
+    
+    return () => {
+      lazyImages.forEach(img => {
+        lazyImageObserver.unobserve(img);
+      });
+    };
+  }, []);
+
+  return (
+    <img 
+      className={`lazy-image opacity-0 transition-opacity duration-500 ${className || ''}`}
+      data-src={src}
+      src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+      alt={alt}
+      width={width}
+      height={height}
+    />
+  );
+};
+
+export default LazyImage;

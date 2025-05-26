@@ -1,0 +1,43 @@
+import { useEffect } from 'react';
+
+// Componente para criar um grid responsivo adaptativo
+const ResponsiveGrid = ({ 
+  children, 
+  cols = { 
+    sm: 1, 
+    md: 2, 
+    lg: 3, 
+    xl: 4 
+  }, 
+  gap = 6,
+  className = ''
+}: {
+  children: React.ReactNode;
+  cols?: {
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+  };
+  gap?: number;
+  className?: string;
+}) => {
+  // Definir classes de grid baseadas nas colunas para cada breakpoint
+  const gridClasses = `
+    grid 
+    grid-cols-${cols.sm || 1} 
+    md:grid-cols-${cols.md || 2} 
+    lg:grid-cols-${cols.lg || 3} 
+    xl:grid-cols-${cols.xl || 4} 
+    gap-${gap}
+    ${className}
+  `;
+
+  return (
+    <div className={gridClasses}>
+      {children}
+    </div>
+  );
+};
+
+export default ResponsiveGrid;
